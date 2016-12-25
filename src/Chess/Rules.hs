@@ -6,7 +6,7 @@ import Chess.Move
 import Chess.Position
 
 inCheck :: Side -> Position -> Bool
-side `inCheck` position = and $ kingBoard side position `intersection` getCaptureBoard position side
+side `inCheck` position = and $ kingBoard side position `intersection` getCaptureBoard position (other side)
 
 -- Apply a piece capturing pattern to a board, accounting for occupied squares.
 extendCaptures :: Side -> Piece -> Board -> Board -> Board
@@ -14,7 +14,7 @@ extendCaptures side piece pieceBoard occupiedBoard = case piece of
   Pawn -> (`fillSquares` emptyBoard) $ filter onBoard $ concatMap pseudoAttackedSquares pieceSquares where
     pieceSquares = squares pieceBoard
     pseudoAttackedSquares square = fmap ($ square) [pawnCaptureRight side, pawnCaptureLeft side]
-  Rook -> (`fillSquares` emptyBoard) $ filter onBoard $ concatMap pseudoAttackedSquares pieceSquares where
+  Rook -> (`fillSquares` emptyBoard) $ concatMap pseudoAttackedSquares pieceSquares where
     pieceSquares = squares pieceBoard
     pseudoAttackedSquares square = fmap ($ square) (restrictedMoves side piece square restriction) where
       restriction square = onBoard square && (not $ isFilled square occupiedBoard)

@@ -2,7 +2,7 @@ name:                chess
 version:             0.1.0.0
 synopsis:            Game representation, search and evaluation.
 description:         Please see README.md
---homepage:            https://github.com/githubuser/chess#readme
+homepage:            https://github.com/michaelmp/chess#readme
 license:             AGPL
 license-file:        LICENSE
 author:              Michael Morris-Pearce
@@ -36,4 +36,4 @@ test-suite chess-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/chess
+  location: https://github.com/michaelmp/chess
