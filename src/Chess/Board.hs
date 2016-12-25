@@ -178,31 +178,9 @@ moveSquare from to = clearSquare from . fillSquare to
 isFilled :: AlgebraicSquare -> Board -> Bool
 isFilled square board = board !! toIndex square
 
-intermediateValues list = if length list > 2
+intermediateValues list = if length list >= 2
   then drop 1 $ reverse $ drop 1 list
   else list
-
--- All of the intermediate squares covered (non-inclusive) by an orthogonal movement.
-orthogonalIntermediateCoverage :: AlgebraicSquare -> AlgebraicSquare -> [AlgebraicSquare]
-orthogonalIntermediateCoverage origin destination = [AlgebraicSquare f r | f <- files, r <- ranks] where
-  files = intermediateValues [lesser..greater] where
-    lesser = min (file origin) (file destination)
-    greater = max (file origin) (file destination)
-  ranks = intermediateValues [lesser..greater] where
-    lesser = min (rank origin) (rank destination)
-    greater = max (rank origin) (rank destination)
-
--- All of the intermediate squares covered (non-inclusive) by a diagonal
--- movement.
-diagonalIntermediateCoverage :: AlgebraicSquare -> AlgebraicSquare -> [AlgebraicSquare]
-diagonalIntermediateCoverage origin destination = [AlgebraicSquare (C.chr (C.ord originalFile + fileDiff)) (originalRank + rankDiff) | (fileDiff, rankDiff) <- diffs] where
-  originalFile = file origin
-  originalRank = rank origin
-  diffs = intermediateValues $ (\n -> (n * fileSign, n * rankSign)) <$> take (k + 1) [0..] where
-    fileSign = if file destination > file origin then 1 else (-1)
-    rankSign = if rank destination > rank origin  then 1 else (-1)
-    k = abs $ rank destination - rank origin
-
 
 union :: Board -> Board -> Board
 a `union` b = uncurry (||) <$> L.zip a b
