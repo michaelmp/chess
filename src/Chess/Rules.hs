@@ -17,9 +17,6 @@ pseudoCaptures side piece pieceBoard occupiedBoard = case piece of
   Pawn   -> (`fillSquares` emptyBoard) $ filter onBoard $ concatMap pseudoAttackedSquares pieceSquares where
     pieceSquares = squares pieceBoard
     pseudoAttackedSquares square = fmap ($ square) [pawnCaptureRight side, pawnCaptureLeft side]
-  King   -> (`fillSquares` emptyBoard) $ filter onBoard $ concatMap pseudoAttackedSquares pieceSquares where
-    pieceSquares = squares pieceBoard
-    pseudoAttackedSquares square = fmap ($ square) [up, upRight, right, downRight, down, downLeft, left, upLeft]
   Knight -> (`fillSquares` emptyBoard) $ concatMap pseudoAttackedSquares pieceSquares where
     pieceSquares = squares pieceBoard
     pseudoAttackedSquares square = fmap ($ square) (restrictedMoves side piece square restriction) where

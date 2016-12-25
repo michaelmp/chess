@@ -98,9 +98,7 @@ pieceMovementPatternPatterns side piece = case piece of
               down,
               downLeft,
               left,
-              upLeft,
-              kingCastleShort,
-              kingCastleLong
+              upLeft
             ]
   Queen  -> [
               slide up,
@@ -117,9 +115,6 @@ pieceMovementPatternPatterns side piece = case piece of
               slide right,
               slide down,
               slide left
-            ] ++ fmap (:[]) [
-              rookCastleShort,
-              rookCastleLong
             ]
   Bishop -> [
               slide upRight,
@@ -139,9 +134,7 @@ pieceMovementPatternPatterns side piece = case piece of
             ]
   Pawn   -> fmap (:[]) [
               pawnAdvance side,
-              pawnDoubleAdvance side,
-              pawnCaptureRight side,
-              pawnCaptureLeft side
+              pawnDoubleAdvance side
             ]
 
 -- Finite.

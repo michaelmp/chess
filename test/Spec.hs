@@ -119,11 +119,18 @@ illegal_e2_to_e5 = TestLabel name $ TestCase (assert $ expected == actual) where
   actual = isLegalMove initialPosition move
   move = PieceMovement e2 e5 Nothing
 
+illegal_e2_to_e2 = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "A pawn cannot move from e2 to e2 in the initial position."
+  expected = False
+  actual = isLegalMove initialPosition move
+  move = PieceMovement e2 e2 Nothing
+
 testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $ TestList [
   TestLabel "Pawns" $ TestList [
     legal_e2_to_e4,
     legal_e2_to_e3,
-    illegal_e2_to_e5
+    illegal_e2_to_e5,
+    illegal_e2_to_e2
     ]
   ]
 
