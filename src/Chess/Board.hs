@@ -38,7 +38,13 @@ bloIndex file rank = fileIndex file * 8 + rankIndex rank
 data AlgebraicSquare = AlgebraicSquare {
   file :: Char,
   rank :: Int
-  } deriving (Show, Eq)
+  } deriving (Eq)
+
+showAlgebraicSquare :: AlgebraicSquare -> String
+showAlgebraicSquare s = file s : show (rank s)
+
+instance Show AlgebraicSquare where
+  show = showAlgebraicSquare
 
 instance BottomLeftOrder AlgebraicSquare where
   toIndex (AlgebraicSquare file rank) = bloIndex file rank

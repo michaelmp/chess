@@ -20,11 +20,11 @@ pseudoCaptures side piece pieceBoard occupiedBoard = case piece of
   Knight -> (`fillSquares` emptyBoard) $ concatMap pseudoAttackedSquares pieceSquares where
     pieceSquares = squares pieceBoard
     pseudoAttackedSquares square = fmap ($ square) (restrictedMoves side piece square restriction) where
-      restriction square = onBoard square
+      restriction = onBoard 
   _      -> (`fillSquares` emptyBoard) $ concatMap pseudoAttackedSquares pieceSquares where
     pieceSquares = squares pieceBoard
     pseudoAttackedSquares square = fmap ($ square) (restrictedMoves side piece square restriction) where
-      restriction square = onBoard square && (not $ isFilled square occupiedBoard)
+      restriction square = onBoard square && not (isFilled square occupiedBoard)
 
 getCaptureBoard :: Position -> Side -> Board
 getCaptureBoard position side = let obstacles = getOccupiedSquares position in case side of
@@ -45,8 +45,8 @@ getCaptureBoard position side = let obstacles = getOccupiedSquares position in c
     pseudoCaptures side King (blackKings position) obstacles
     ]
 
-isLegalMove :: Position -> Move -> Bool
-isLegalMove position move = case move of
+legal :: Position -> Move -> Bool
+legal position move = case move of
   -- i.e. O-O from e1 to g1 or e8 to g8.
   CastleShort -> and restrictions where
     restrictions = [
@@ -76,12 +76,16 @@ isLegalMove position move = case move of
   -- A non-promoting piece movement is legal if all of the following criteria are met:
   -- 1) The movement is not obstructed.
   -- 2) The movement would not result in check on the same side king.
+  -- 3) The movement from origin to destination is appropriate for type of piece.
   PieceMovement origin destination Nothing -> and restrictions where
     restrictions = case sideAndPiece of
       Just (side, piece) -> [
         not $ isInterposed piece origin destination (getOccupiedSquares position),
-        not $ inCheck side (applyMove move position)
-        ]
+        not $ inCheck side (applyMove move position),
+        any appropriatePattern patterns
+        ] where
+          appropriatePattern p = p origin == destination
+          patterns = boundedMoves side piece origin
       Nothing -> [False]
     sideAndPiece = getPiece position origin
     side = sideToMove position

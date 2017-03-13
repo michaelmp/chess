@@ -97,40 +97,38 @@ testPseudoMoves = TestList [
 
 testCastling = TestLabel "Castling" $ TestList $ TestCase <$> assertions where
   assertions = [
-    assert $ not (isLegalMove initialPosition CastleShort),
-    assert $ not (isLegalMove initialPosition CastleLong)
+    assert $ not (legal initialPosition CastleShort),
+    assert $ not (legal initialPosition CastleLong)
     ]
 
-legal_e2_to_e4 = TestLabel name $ TestCase (assert $ expected == actual) where
-  name = "A pawn can move from e2 to e4 in the initial position."
+legalMoveTest origin destination position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "It is legal to move from " ++ show origin ++ " to " ++ show destination ++ " " ++ positionDescr
   expected = True
-  actual = isLegalMove initialPosition move
-  move = PieceMovement e2 e4 Nothing
+  actual = legal position move
+  move = PieceMovement origin destination Nothing
 
-legal_e2_to_e3 = TestLabel name $ TestCase (assert $ expected == actual) where
-  name = "A pawn can move from e2 to e3 in the initial position."
-  expected = True
-  actual = isLegalMove initialPosition move
-  move = PieceMovement e2 e3 Nothing
-
-illegal_e2_to_e5 = TestLabel name $ TestCase (assert $ expected == actual) where
-  name = "A pawn cannot move from e2 to e5 in the initial position."
-  expected = False
-  actual = isLegalMove initialPosition move
-  move = PieceMovement e2 e5 Nothing
-
-illegal_e2_to_e2 = TestLabel name $ TestCase (assert $ expected == actual) where
-  name = "A pawn cannot move from e2 to e2 in the initial position."
-  expected = False
-  actual = isLegalMove initialPosition move
-  move = PieceMovement e2 e2 Nothing
+illegalMoveTest origin destination position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "It is illegal to move from " ++ show origin ++ " to " ++ show destination ++ " " ++ positionDescr
+  expected = False 
+  actual = legal position move
+  move = PieceMovement origin destination Nothing
 
 testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $ TestList [
   TestLabel "Pawns" $ TestList [
-    legal_e2_to_e4,
-    legal_e2_to_e3,
-    illegal_e2_to_e5,
-    illegal_e2_to_e2
+    legalMoveTest e2 e4 initialPosition "in the initial position",
+    legalMoveTest e2 e3 initialPosition "in the initial position",
+    legalMoveTest e7 e5 initialPosition "in the initial position",
+    legalMoveTest e7 e6 initialPosition "in the initial position",
+    illegalMoveTest e2 e5 initialPosition "in the initial position",
+    illegalMoveTest e2 e2 initialPosition "in the initial position",
+    illegalMoveTest e2 e1 initialPosition "in the initial position",
+    illegalMoveTest e2 f3 initialPosition "in the initial position",
+    illegalMoveTest e2 d3 initialPosition "in the initial position",
+    illegalMoveTest e7 e4 initialPosition "in the initial position",
+    illegalMoveTest e7 e7 initialPosition "in the initial position",
+    illegalMoveTest e7 e8 initialPosition "in the initial position",
+    illegalMoveTest e7 f6 initialPosition "in the initial position",
+    illegalMoveTest e7 d6 initialPosition "in the initial position"
     ]
   ]
 
