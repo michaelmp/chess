@@ -81,7 +81,7 @@ legal position move = case move of
     restrictions = case sideAndPiece of
       Just (side, piece) -> [
         not $ isInterposed piece origin destination (getOccupiedSquares position),
-        not $ inCheck side (applyMove move position),
+        not $ inCheck side (apply move position),
         any appropriatePattern patterns
         ] where
           appropriatePattern p = p origin == destination
@@ -93,12 +93,54 @@ legal position move = case move of
       White -> isFilled origin (whiteKings position)
       Black -> isFilled origin (blackKings position)
 
--- TODO: Implement
-applyMove :: Move -> Position -> Position
-applyMove move position = position
+apply :: Move -> Position -> Position
+apply move position = case move of
+  CastleShort -> undefined
+
+  CastleLong -> undefined
+
+  PieceCapture origin destination (Just promotion) -> undefined
+  PieceCapture origin destination Nothing -> undefined
+
+  PieceMovement origin destination (Just promotion)-> undefined
+
+  PieceMovement origin destination Nothing -> Position {
+    sideToMove = other $ sideToMove position,
+    whitePawns   = moveSquare origin destination (whitePawns position),
+    blackPawns   = moveSquare origin destination (blackPawns position),
+    whiteKnights = moveSquare origin destination (whiteKnights position),
+    blackKnights = moveSquare origin destination (blackKnights position),
+    whiteBishops = moveSquare origin destination (whiteBishops position),
+    blackBishops = moveSquare origin destination (blackBishops position),
+    whiteRooks   = moveSquare origin destination (whiteRooks position),
+    blackRooks   = moveSquare origin destination (blackRooks position),
+    whiteQueens  = moveSquare origin destination (whiteQueens position),
+    blackQueens  = moveSquare origin destination (blackQueens position),
+    whiteKings   = moveSquare origin destination (whiteKings position),
+    blackKings   = moveSquare origin destination (blackKings position),
+    canWhiteCastleShort = canWhiteCastleShort position,
+    canWhiteCastleLong = canWhiteCastleLong position,
+    canBlackCastleShort = canBlackCastleShort position,
+    canBlackCastleLong = canBlackCastleLong position,
+    enPassant = enPassant',
+    reversibleMoves = if isPawnMove then 0 else reversibleMoves position + 1
+    } where
+      sideAndPiece = getPiece position origin
+      enPassant' = case sideAndPiece of
+        Just (side, piece) -> case piece of
+          Pawn -> if pawnDoubleAdvance side origin == destination
+                       then Just $ pawnAdvance side origin
+                       else Nothing
+          _    -> Nothing
+        Nothing -> Nothing
+      isPawnMove = case sideAndPiece of
+        Just (side, piece) -> case piece of
+          Pawn -> True
+          _    -> False
+        Nothing -> False
 
 legalMoves :: Position -> [Move]
-legalMoves _ = []
+legalMoves _ = undefined
 
 -- All of the intermediate squares covered (non-inclusive) by an orthogonal movement.
 orthogonalIntermediateCoverage :: AlgebraicSquare -> AlgebraicSquare -> [AlgebraicSquare]

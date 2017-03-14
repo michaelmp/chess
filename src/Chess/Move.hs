@@ -151,5 +151,16 @@ type Origin = AlgebraicSquare
 type Destination = AlgebraicSquare
 type PromotionPiece = Piece
 
-data Move = CastleShort | CastleLong | PieceCapture Origin Destination (Maybe PromotionPiece) | PieceMovement Origin Destination (Maybe PromotionPiece)
-
+data Move =
+  CastleShort |
+  CastleLong |
+  PieceCapture {
+    origin :: Origin,
+    destination :: Destination,
+    promotion :: Maybe PromotionPiece
+  } |
+  PieceMovement {
+    origin :: Origin,
+    destination :: Destination,
+    promotion :: Maybe PromotionPiece
+  }

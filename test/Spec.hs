@@ -117,8 +117,8 @@ testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $
   TestLabel "Pawns" $ TestList [
     legalMoveTest e2 e4 initialPosition "in the initial position",
     legalMoveTest e2 e3 initialPosition "in the initial position",
-    legalMoveTest e7 e5 initialPosition "in the initial position",
-    legalMoveTest e7 e6 initialPosition "in the initial position",
+    illegalMoveTest e7 e5 initialPosition "in the initial position",
+    illegalMoveTest e7 e6 initialPosition "in the initial position",
     illegalMoveTest e2 e5 initialPosition "in the initial position",
     illegalMoveTest e2 e2 initialPosition "in the initial position",
     illegalMoveTest e2 e1 initialPosition "in the initial position",
@@ -129,6 +129,14 @@ testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $
     illegalMoveTest e7 e8 initialPosition "in the initial position",
     illegalMoveTest e7 f6 initialPosition "in the initial position",
     illegalMoveTest e7 d6 initialPosition "in the initial position"
+    ],
+  TestLabel "Knights" $ TestList [
+    legalMoveTest g1 f3 initialPosition "in the initial position",
+    legalMoveTest g1 h3 initialPosition "in the initial position",
+    illegalMoveTest g8 f6 initialPosition "in the initial position",
+    illegalMoveTest g8 h6 initialPosition "in the initial position",
+    illegalMoveTest g1 e2 initialPosition "in the initial position",
+    illegalMoveTest g8 e7 initialPosition "in the initial position"
     ]
   ]
 
