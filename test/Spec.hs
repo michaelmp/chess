@@ -113,6 +113,8 @@ illegalMoveTest origin destination position positionDescr = TestLabel name $ Tes
   actual = legal position move
   move = PieceMovement origin destination Nothing
 
+after1e4e5 = (apply (PieceMovement e7 e5 Nothing) . apply (PieceMovement e2 e4 Nothing)) initialPosition
+
 testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $ TestList [
   TestLabel "Pawns" $ TestList [
     legalMoveTest e2 e4 initialPosition "in the initial position",
@@ -137,6 +139,17 @@ testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $
     illegalMoveTest g8 h6 initialPosition "in the initial position",
     illegalMoveTest g1 e2 initialPosition "in the initial position",
     illegalMoveTest g8 e7 initialPosition "in the initial position"
+    ],
+  TestLabel "Bishops" $ TestList [
+    legalMoveTest f1 e2 after1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 d3 after1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 c4 after1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 b5 after1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 a6 after1e4e5 "after 1.e4 e5",
+    illegalMoveTest f1 f3 after1e4e5 "after 1.e4 e5",
+    illegalMoveTest f1 g2 after1e4e5 "after 1.e4 e5",
+    illegalMoveTest c1 d2 after1e4e5 "after 1.e4 e5",
+    illegalMoveTest f8 e7 after1e4e5 "after 1.e4 e5"
     ]
   ]
 

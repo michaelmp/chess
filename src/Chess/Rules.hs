@@ -65,8 +65,24 @@ legal position move = case move of
     collisions = getOccupiedSquares position
     attackedBoard = getCaptureBoard position side
 
+  -- TODO: refactor with CastleShort
   -- i.e. O-O-O from e1 to c1 or e8 to c8.
-  CastleLong -> undefined
+  CastleLong -> and restrictions where
+    restrictions = [
+      notAlreadyMovedKingOrRook,
+      areIntermediateSquaresEmpty,
+      noSquaresAttacked
+      ]
+    notAlreadyMovedKingOrRook = canSideCastleLong side position
+    areIntermediateSquaresEmpty = case side of
+      White -> and $ (not . flip isFilled collisions) <$> [d1, c1, b1]
+      Black -> and $ (not . flip isFilled collisions) <$> [d8, c8, b8]
+    noSquaresAttacked = case side of
+      White -> and $ (not . flip isFilled attackedBoard) <$> [e1, d1, c1]
+      Black -> and $ (not . flip isFilled attackedBoard) <$> [e8, d8, c8]
+    side = sideToMove position
+    collisions = getOccupiedSquares position
+    attackedBoard = getCaptureBoard position side
 
   PieceCapture origin destination (Just promotionPiece) -> undefined
   PieceCapture origin destination Nothing -> undefined
@@ -74,12 +90,15 @@ legal position move = case move of
   PieceMovement origin destination (Just promotionPiece) -> undefined
 
   -- A non-promoting piece movement is legal if all of the following criteria are met:
-  -- 1) The movement is not obstructed.
-  -- 2) The movement would not result in check on the same side king.
-  -- 3) The movement from origin to destination is appropriate for type of piece.
+  -- 1) The piece moved belongs to the side to move.
+  -- 2) The movement is not obstructed.
+  -- 3) The movement would not result in check on the same side king.
+  -- 4) The movement from origin to destination is appropriate for type of piece.
   PieceMovement origin destination Nothing -> and restrictions where
     restrictions = case sideAndPiece of
       Just (side, piece) -> [
+        side == sideToMove position,
+        not blockedDestination,
         not $ isInterposed piece origin destination (getOccupiedSquares position),
         not $ inCheck side (apply move position),
         any appropriatePattern patterns
@@ -88,6 +107,7 @@ legal position move = case move of
           patterns = boundedMoves side piece origin
       Nothing -> [False]
     sideAndPiece = getPiece position origin
+    blockedDestination = isFilled destination (getOccupiedSquares position)
     side = sideToMove position
     isKing = case side of
       White -> isFilled origin (whiteKings position)
