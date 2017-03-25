@@ -11,15 +11,6 @@ import Chess.Position
 import Chess.Rules
 import Chess.Theory
 
-testUnionIdentity = TestCase $ assertEqual name unionBoard anyBoard where
-    name = "identity: empty U any == any"
-    unionBoard = emptyBoard `union` anyBoard
-    anyBoard = fillSquare e4 emptyBoard
-
-testBoardUnion = TestList [
-  testUnionIdentity
-  ]
-
 testPawnPseudoCaptureCentral = TestLabel name $ TestCase (assert $ expected == actual) where
   name = "white pawn on e4 captures [d5, f5]"
   expected = (fillSquare d5 . fillSquare f5) emptyBoard
@@ -69,24 +60,6 @@ testPseudoCaptures = TestList [
     testBishopPseudoCaptureUnobstructed,
     testBishopPseudoCaptureObstructed
     ]
-  ]
-
--- TODO: Use quick check.
-testRowColumnIntersection = TestCase $ assertEqual name intersectionBoard singletonBoard where
-  name = "intersection: row X column = 1 square"
-  singletonBoard = fillSquare pivot emptyBoard
-  intersectionBoard = rowBoard `intersection` columnBoard
-  rowBoard = foldl (flip fillSquare) emptyBoard rank4
-  columnBoard = foldl (flip fillSquare) emptyBoard eFile
-  pivot = e4
-
-testBoardIntersection = TestList [
-  testRowColumnIntersection
-  ]
-
-testBoardRepresentation = TestList [
-  testBoardUnion,
-  testBoardIntersection
   ]
 
 testKnightPseudoMoves = TestLabel "Knights" $ TestCase $ assertBool name expr where
@@ -192,23 +165,24 @@ testInterposition = TestList $ fmap TestCase [
   assert $ not $ isInterposed Bishop g2 e4 (fillSquare g2 emptyBoard)
   ]
 
-tests = [
-  TestLabel "Board Representation" testBoardRepresentation,
-  TestLabel "Interposition" testInterposition,
-  TestLabel "Pseudo Captures" testPseudoCaptures,
-  TestLabel "Pseudo Moves" testPseudoMoves,
-  TestLabel "Legal Moves" testLegalMoves
-  ]
-
 prop_boardUnionIdentity = testProperty
   "The union of any board with an empty board is the board itself."
   (\board -> (emptyBoard `union` board) == board)
 
+-- TODO: Generate rank and file sets.
+prop_boardIntersectionRowColSingular = testProperty
+  "The intersection of a row and column is a square."
+  prop where
+    prop rank file = rowBoard `intersection` colBoard == singletonBoard where
+      rowBoard = foldl (flip fillSquare) emptyBoard rank
+      colBoard = foldl (flip fillSquare) emptyBoard file
+      singletonBoard = fillSquare (AlgebraicSquare rank file) emptyBoard
+
 main = defaultMain [
   testGroup "Board Representation" [
-    prop_boardUnionIdentity
+    prop_boardUnionIdentity,
+    prop_boardIntersectionRowColSingular
     ],
-  testGroup "(deprecated) Board Representation" $ hUnitTestToTests testBoardRepresentation,
   testGroup "Interposition" $ hUnitTestToTests testInterposition,
   testGroup "Pseudo Captures" $ hUnitTestToTests testPseudoCaptures,
   testGroup "Pseudo Moves" $ hUnitTestToTests testPseudoMoves,
