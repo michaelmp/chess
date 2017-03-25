@@ -4,7 +4,6 @@ import qualified Data.Char as C
 
 import Chess
 import Chess.Board
-import Chess.Position
 
 type MovementPattern = AlgebraicSquare -> AlgebraicSquare
 

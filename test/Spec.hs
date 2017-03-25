@@ -1,14 +1,16 @@
 import Test.Framework
 import Test.Framework.Providers.HUnit
+import Test.Framework.Providers.QuickCheck2
 import Test.HUnit
+import Test.QuickCheck
 
 import Chess
 import Chess.Board
 import Chess.Move
 import Chess.Position
 import Chess.Rules
+import Chess.Theory
 
--- TODO: Use quick check.
 testUnionIdentity = TestCase $ assertEqual name unionBoard anyBoard where
     name = "identity: empty U any == any"
     unionBoard = emptyBoard `union` anyBoard
@@ -95,25 +97,43 @@ testPseudoMoves = TestList [
   testKnightPseudoMoves
   ]
 
-testCastling = TestLabel "Castling" $ TestList $ TestCase <$> assertions where
-  assertions = [
-    assert $ not (legal initialPosition CastleShort),
-    assert $ not (legal initialPosition CastleLong)
-    ]
+legalShortCastleTest position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "O-O is legal " ++ positionDescr
+  expected = True
+  actual = legal position CastleShort
+
+illegalShortCastleTest position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "O-O is illegal " ++ positionDescr
+  expected = False
+  actual = legal position CastleShort
+
+legalLongCastleTest position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "O-O-O is legal " ++ positionDescr
+  expected = True
+  actual = legal position CastleLong
+
+illegalLongCastleTest position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
+  name = "O-O-O is illegal " ++ positionDescr
+  expected = False
+  actual = legal position CastleLong
+
+testCastling = TestLabel "Castling" $ TestList [
+  illegalShortCastleTest initialPosition "in the initial position", 
+  illegalLongCastleTest initialPosition "in the initial position",
+  legalShortCastleTest positionBerlin "in the Ruy Lopez, 3...Nf6"
+  ]
 
 legalMoveTest origin destination position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
-  name = "It is legal to move from " ++ show origin ++ " to " ++ show destination ++ " " ++ positionDescr
+  name = show origin ++ " to " ++ show destination ++ " is legal " ++ positionDescr
   expected = True
   actual = legal position move
   move = PieceMovement origin destination Nothing
 
 illegalMoveTest origin destination position positionDescr = TestLabel name $ TestCase (assert $ expected == actual) where
-  name = "It is illegal to move from " ++ show origin ++ " to " ++ show destination ++ " " ++ positionDescr
+  name = show origin ++ " to " ++ show destination ++ " is illegal " ++ positionDescr
   expected = False 
   actual = legal position move
   move = PieceMovement origin destination Nothing
-
-after1e4e5 = (apply (PieceMovement e7 e5 Nothing) . apply (PieceMovement e2 e4 Nothing)) initialPosition
 
 testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $ TestList [
   TestLabel "Pawns" $ TestList [
@@ -138,18 +158,19 @@ testLegalPieceMovementNoPromotion = TestLabel "Piece Movement (w/o promotion)" $
     illegalMoveTest g8 f6 initialPosition "in the initial position",
     illegalMoveTest g8 h6 initialPosition "in the initial position",
     illegalMoveTest g1 e2 initialPosition "in the initial position",
+    legalMoveTest g1 e2 position1e4e5 "after 1.e4 e5",
     illegalMoveTest g8 e7 initialPosition "in the initial position"
     ],
   TestLabel "Bishops" $ TestList [
-    legalMoveTest f1 e2 after1e4e5 "after 1.e4 e5",
-    legalMoveTest f1 d3 after1e4e5 "after 1.e4 e5",
-    legalMoveTest f1 c4 after1e4e5 "after 1.e4 e5",
-    legalMoveTest f1 b5 after1e4e5 "after 1.e4 e5",
-    legalMoveTest f1 a6 after1e4e5 "after 1.e4 e5",
-    illegalMoveTest f1 f3 after1e4e5 "after 1.e4 e5",
-    illegalMoveTest f1 g2 after1e4e5 "after 1.e4 e5",
-    illegalMoveTest c1 d2 after1e4e5 "after 1.e4 e5",
-    illegalMoveTest f8 e7 after1e4e5 "after 1.e4 e5"
+    legalMoveTest f1 e2 position1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 d3 position1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 c4 position1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 b5 position1e4e5 "after 1.e4 e5",
+    legalMoveTest f1 a6 position1e4e5 "after 1.e4 e5",
+    illegalMoveTest f1 f3 position1e4e5 "after 1.e4 e5",
+    illegalMoveTest f1 g2 position1e4e5 "after 1.e4 e5",
+    illegalMoveTest c1 d2 position1e4e5 "after 1.e4 e5",
+    illegalMoveTest f8 e7 position1e4e5 "after 1.e4 e5"
     ]
   ]
 
@@ -171,7 +192,7 @@ testInterposition = TestList $ fmap TestCase [
   assert $ not $ isInterposed Bishop g2 e4 (fillSquare g2 emptyBoard)
   ]
 
-tests = TestList [
+tests = [
   TestLabel "Board Representation" testBoardRepresentation,
   TestLabel "Interposition" testInterposition,
   TestLabel "Pseudo Captures" testPseudoCaptures,
@@ -179,4 +200,17 @@ tests = TestList [
   TestLabel "Legal Moves" testLegalMoves
   ]
 
-main = defaultMain $ hUnitTestToTests tests
+prop_boardUnionIdentity = testProperty
+  "The union of any board with an empty board is the board itself."
+  (\board -> (emptyBoard `union` board) == board)
+
+main = defaultMain [
+  testGroup "Board Representation" [
+    prop_boardUnionIdentity
+    ],
+  testGroup "(deprecated) Board Representation" $ hUnitTestToTests testBoardRepresentation,
+  testGroup "Interposition" $ hUnitTestToTests testInterposition,
+  testGroup "Pseudo Captures" $ hUnitTestToTests testPseudoCaptures,
+  testGroup "Pseudo Moves" $ hUnitTestToTests testPseudoMoves,
+  testGroup "Legal Moves" $ hUnitTestToTests testLegalMoves
+  ]
