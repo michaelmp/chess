@@ -17,8 +17,10 @@ library
   exposed-modules:     Chess, Chess.Board, Chess.Move, Chess.Position,
                        Chess.Rules, Chess.Theory
   build-depends:       base >= 4.7 && < 5
-                     , text
                      , ansi-terminal
+                     , text
+                     , random
+                     , QuickCheck
   default-language:    Haskell2010
 
 test-suite chess-test

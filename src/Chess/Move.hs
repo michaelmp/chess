@@ -13,42 +13,42 @@ isOrtho origin destination = sameRank || sameFile where
   sameFile = file origin == file destination
 
 up :: MovementPattern
-up (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+up (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = file
   rank' = rank + 1 
 
 upRight :: MovementPattern
-upRight (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+upRight (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = C.chr $ C.ord file + 1
   rank' = rank + 1 
 
 right :: MovementPattern
-right (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+right (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = C.chr $ C.ord file + 1
   rank' = rank 
 
 downRight :: MovementPattern
-downRight (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+downRight (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = C.chr $ C.ord file + 1
   rank' = rank - 1 
 
 down :: MovementPattern
-down (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+down (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = file
   rank' = rank - 1 
 
 downLeft :: MovementPattern
-downLeft (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+downLeft (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = C.chr $ C.ord file - 1
   rank' = rank - 1 
 
 left :: MovementPattern
-left (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+left (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = C.chr $ C.ord file - 1
   rank' = rank 
 
 upLeft :: MovementPattern
-upLeft (AlgebraicSquare file rank) = AlgebraicSquare file' rank' where
+upLeft (AlgebraicSquare (File file) (Rank rank)) = AlgebraicSquare (File file') (Rank rank') where
   file' = C.chr $ C.ord file - 1
   rank' = rank + 1 
 

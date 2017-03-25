@@ -174,10 +174,10 @@ prop_boardUnionIdentity = testProperty
 prop_boardIntersectionRowColSingular = testProperty
   "The intersection of a row and column is a square."
   prop where
-    prop rank file = rowBoard `intersection` colBoard == singletonBoard where
-      rowBoard = foldl (flip fillSquare) emptyBoard rank
-      colBoard = foldl (flip fillSquare) emptyBoard file
-      singletonBoard = fillSquare (AlgebraicSquare rank file) emptyBoard
+    prop (Rank rank) (File file) = rowBoard `intersection` colBoard == singletonBoard where
+      rowBoard = foldl (flip fillSquare) emptyBoard (squares (Rank rank))
+      colBoard = foldl (flip fillSquare) emptyBoard (squares (File file))
+      singletonBoard = fillSquare (AlgebraicSquare (File file) (Rank rank)) emptyBoard
 
 main = defaultMain [
   testGroup "Board Representation" [

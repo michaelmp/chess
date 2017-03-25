@@ -8,7 +8,8 @@ import Chess.Move
 import Chess.Position
 
 inCheck :: Side -> Position -> Bool
-side `inCheck` position = and $ kingBoard side position `intersection` getCaptureBoard position (other side)
+side `inCheck` position = and board where
+  Board board = kingBoard side position `intersection` getCaptureBoard position (other side)
 
 -- Apply a piece capturing pattern to a board, accounting for occupied squares.
 -- TODO: Account for obstructing capturable pieces except for the first in line.
@@ -175,13 +176,15 @@ orthogonalIntermediateCoverage origin destination = [AlgebraicSquare f r | f <- 
 -- All of the intermediate squares covered (non-inclusive) by a diagonal
 -- movement.
 diagonalIntermediateCoverage :: AlgebraicSquare -> AlgebraicSquare -> [AlgebraicSquare]
-diagonalIntermediateCoverage origin destination = [AlgebraicSquare (C.chr (C.ord originalFile + fileDiff)) (originalRank + rankDiff) | (fileDiff, rankDiff) <- diffs] where
-  originalFile = file origin
-  originalRank = rank origin
+diagonalIntermediateCoverage origin destination = [AlgebraicSquare (File (C.chr (C.ord originalFile + fileDiff))) (Rank (originalRank + rankDiff)) | (fileDiff, rankDiff) <- diffs] where
+  File originalFile = file origin
+  Rank originalRank = rank origin
+  File destinationFile = file destination
+  Rank destinationRank = rank destination
   diffs = intermediateValues $ (\n -> (n * fileSign, n * rankSign)) <$> take (k + 1) [0..] where
-    fileSign = if file destination > file origin then 1 else (-1)
-    rankSign = if rank destination > rank origin  then 1 else (-1)
-    k = abs $ rank destination - rank origin
+    fileSign = if destinationFile > originalFile then 1 else (-1)
+    rankSign = if destinationRank > originalRank then 1 else (-1)
+    k = abs $ destinationRank - originalRank
 
 -- Would a sliding movement pass over any filled squares on a board?
 -- Not including the origin or destination square.

@@ -79,8 +79,8 @@ whitePieces position = reduce layers where
 initialPosition = Position {
   sideToMove = White,
 
-  whitePawns = foldl (flip fillSquare) emptyBoard rank2,
-  blackPawns = foldl (flip fillSquare) emptyBoard rank7,
+  whitePawns = foldl (flip fillSquare) emptyBoard (squares $ Rank 2),
+  blackPawns = foldl (flip fillSquare) emptyBoard (squares $ Rank 7),
   whiteKnights = fillSquare b1 . fillSquare g1 $ emptyBoard,
   blackKnights = fillSquare b8 . fillSquare g8 $ emptyBoard,
   whiteBishops = fillSquare c1 . fillSquare f1 $ emptyBoard,
@@ -149,14 +149,14 @@ prettyPrint :: Position -> IO ()
 prettyPrint position = do
   putStrLn "+--------+"
 
-  putStr border >> mapM_ printSquare rank8 >> putStrLn border
-  putStr border >> mapM_ printSquare rank7 >> putStrLn border
-  putStr border >> mapM_ printSquare rank6 >> putStrLn border
-  putStr border >> mapM_ printSquare rank5 >> putStrLn border
-  putStr border >> mapM_ printSquare rank4 >> putStrLn border
-  putStr border >> mapM_ printSquare rank3 >> putStrLn border
-  putStr border >> mapM_ printSquare rank2 >> putStrLn border
-  putStr border >> mapM_ printSquare rank1 >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 8) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 7) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 6) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 5) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 4) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 3) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 2) >> putStrLn border
+  putStr border >> mapM_ printSquare (squares $ Rank 1) >> putStrLn border
 
   putStrLn "+--------+"
 
