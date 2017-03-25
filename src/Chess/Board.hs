@@ -39,6 +39,7 @@ rankIndex rank = rank - 1
 fileIndex file = C.ord file - C.ord 'a'
 bloIndex file rank = fileIndex file * 8 + rankIndex rank
 
+-- TODO Override Show
 newtype Rank = Rank Int deriving (Show, Eq, Ord, Enum, Random)
 newtype File = File Char deriving (Show, Eq, Ord, Enum, Random)
 

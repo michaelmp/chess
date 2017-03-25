@@ -169,8 +169,6 @@ prop_boardUnionIdentity = testProperty
   "The union of any board with an empty board is the board itself."
   (\board -> (emptyBoard `union` board) == board)
 
--- TODO: Generate rank and file sets, test exhaustively.
--- TODO: Create a type class for generating boards in QuickTest.
 prop_boardIntersectionRowColSingular = testProperty
   "The intersection of a row and column is a square."
   prop where
