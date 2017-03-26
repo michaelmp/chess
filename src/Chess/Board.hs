@@ -15,12 +15,7 @@ import Chess
 -- Squares are either light or dark.
 data Shade = Light | Dark deriving (Show, Eq)
 
--- TODO: Algebraic notation is useful for user interaction but a preferable
--- notation for the computer would be strictly numeric. It's up/down/right/left
--- operations would be implemented through bit operations.
---
--- For simplicity, I should extract the algebraic notation from this module
--- wholesale. I should not do this until I am prepared for benchmarking.
+-- TODO: Add all methods declared by AlgebraicSquare to make polymorphic.
 class Square a where
   shade :: a -> Shade
   onBoard :: a -> Bool
@@ -36,38 +31,42 @@ class Square a where
 class BottomLeftOrder a where
   toIndex :: a -> Int
 
+-- A collection of squares.
+class Constellation a where
+  squares :: a -> [AlgebraicSquare]
+
 rankIndex rank = rank - 1
 fileIndex file = C.ord file - C.ord 'a'
 bloIndex file rank = fileIndex file * 8 + rankIndex rank
 
--- TODO Override Show
-newtype Rank = Rank Int deriving (Show, Eq, Ord, Enum, Random)
-newtype File = File Char deriving (Show, Eq, Ord, Enum, Random)
+newtype Rank = Rank Int deriving (Eq, Ord, Enum, Random)
+newtype File = File Char deriving (Eq, Ord, Enum, Random)
 
 instance Bounded Rank where
   minBound = Rank 1
   maxBound = Rank 8
 
-instance Arbitrary Rank where
-  arbitrary = arbitraryBoundedRandom
-
 instance Bounded File where
   minBound = File 'a'
   maxBound = File 'h'
 
+instance Arbitrary Rank where
+  arbitrary = arbitraryBoundedRandom
+
 instance Arbitrary File where
   arbitrary = arbitraryBoundedRandom
 
--- A collection of squares.
--- TODO: How do I make this generic?
-class Constellation a where
-  squares :: a -> [AlgebraicSquare]
+instance Show Rank where
+  show (Rank rank) = show rank
 
-instance Constellation File where
-  squares (File f) = AlgebraicSquare (File f) . Rank <$> [1 .. 8]
+instance Show File where
+  show (File file) = [file]
 
 instance Constellation Rank where
   squares (Rank r) = (`AlgebraicSquare` Rank r) . File <$> ['a'..'h'] 
+
+instance Constellation File where
+  squares (File f) = AlgebraicSquare (File f) . Rank <$> [1 .. 8]
 
 -- Algebraic notation, e.g. 'e2-e4, c7-c5'.
 data AlgebraicSquare = AlgebraicSquare {
