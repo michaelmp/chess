@@ -8,6 +8,7 @@ import qualified Data.List as L
 import Data.Maybe
 import Test.QuickCheck.Arbitrary
 import Test.QuickCheck.Gen
+import Control.Monad
 
 import Chess
 
@@ -43,11 +44,19 @@ bloIndex file rank = fileIndex file * 8 + rankIndex rank
 newtype Rank = Rank Int deriving (Show, Eq, Ord, Enum, Random)
 newtype File = File Char deriving (Show, Eq, Ord, Enum, Random)
 
+instance Bounded Rank where
+  minBound = Rank 1
+  maxBound = Rank 8
+
 instance Arbitrary Rank where
-  arbitrary = choose (Rank 1, Rank 8)
+  arbitrary = arbitraryBoundedRandom
+
+instance Bounded File where
+  minBound = File 'a'
+  maxBound = File 'h'
 
 instance Arbitrary File where
-  arbitrary = choose (File 'a', File 'h')
+  arbitrary = arbitraryBoundedRandom
 
 -- A collection of squares.
 -- TODO: How do I make this generic?
@@ -160,7 +169,11 @@ h8 = AlgebraicSquare (File 'h') (Rank 8)
 
 -- The 64 squares and some binary fact about them.
 -- TODO: Replace with a byte array representation.
-newtype Board = Board [Bool] deriving (Show, Eq, Arbitrary)
+newtype Board = Board [Bool] deriving (Show, Eq)
+
+instance Arbitrary Board where
+  arbitrary = fmap Board $ take 64 <$> infiniteListOf choice where
+    choice = choose (False, True)
 
 emptyBoard = Board $ replicate 64 False
 fullBoard = Board $ replicate 64 True
